@@ -1,0 +1,57 @@
+-- Database creation
+CREATE DATABASE IF NOT EXISTS finance_system;
+USE finance_system;
+
+-- Table: Users
+CREATE TABLE IF NOT EXISTS Users (
+    UserID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    MobilePhone NVARCHAR(15),
+    Email NVARCHAR(100),
+    Password NVARCHAR(255),  -- Store hashed passwords
+    TotalBalance DECIMAL(18, 2) DEFAULT 0.00,  -- Starting balance after signup
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: Statements
+CREATE TABLE IF NOT EXISTS Statements (
+    StatementID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT,  -- Foreign key from Users table
+    StatementNumber NVARCHAR(50),  -- Random string e.g. '#9Y4F3E047K'
+    Datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Avatar NVARCHAR(255),  -- Could be an icon, image, or base64 image
+    Recipient NVARCHAR(50),
+    Designation NVARCHAR(50),
+    Debit DECIMAL(18, 2) DEFAULT 0.00,  -- Debit value
+    Credit DECIMAL(18, 2) DEFAULT 0.00,  -- Credit value
+    Status BIT,  -- 0 = Failed, 1 = Successful
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
+-- Table: Users_Exchange
+CREATE TABLE IF NOT EXISTS Users_Exchange (
+    ExchangeID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT,  -- Foreign key from Users table
+    TotalReceived DECIMAL(18, 2) DEFAULT 0.00,
+    TotalSent DECIMAL(18, 2) DEFAULT 0.00,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
+-- Table: Users_Contacts
+CREATE TABLE IF NOT EXISTS Users_Contacts (
+    ContactID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT,  -- Foreign key from Users table
+    CountryCode NVARCHAR(3),
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    PhoneCode NVARCHAR(5),
+    PhoneNumber NVARCHAR(12),
+    FamilyCode NVARCHAR(5),
+    Favorite BIT DEFAULT 0,  -- 0 = Not favorite, 1 = Favorite
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
+);
+
+-- Indexes for faster search on important columns
+CREATE INDEX idx_statement_user ON Statements(UserID);
+CREATE INDEX idx_contacts_user ON Users_Contacts(UserID);
